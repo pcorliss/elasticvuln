@@ -42,17 +42,21 @@ $ ->
     host = $('#host').val()
     responseContent = $('#response')
 
-    $.getJSON "http://#{host}:9200/_search?source=#{encodeURIComponent(JSON.stringify(payload))}&callback=?", (data) ->
-      console.log(data)
-      responseContent.html('')
-      responseContent.append $('<h2>').text(host)
-      responseContent.append $('<hr>')
+    responseContent.html('')
+    responseContent.append $('<h2>').text("Connecting...")
+    responseContent.append $('<h4>').text("Check the network console for error status.")
 
-      for hit in data["hits"]["hits"]
-        for filename, contents of hit["fields"]
-          responseContent.append $('<h2>').text(filename)
-          responseContent.append $('<pre>').text(contents)
-          responseContent.append $('<hr>')
+    $.ajax
+      url: "http://#{host}:9200/_search?source=#{encodeURIComponent(JSON.stringify(payload))}&callback=?"
+      dataType: 'jsonp'
+      success: (data) ->
+        console.log(data)
+        responseContent.html('')
+        responseContent.append $('<h2>').text(host)
+        responseContent.append $('<hr>')
 
-
-
+        for hit in data["hits"]["hits"]
+          for filename, contents of hit["fields"]
+            responseContent.append $('<h2>').text(filename)
+            responseContent.append $('<pre>').text(contents)
+            responseContent.append $('<hr>')
